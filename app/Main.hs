@@ -1,15 +1,17 @@
 module Main where
 
+import Data.Aeson
+import Data.Aeson.Embedded
+import AWSLambda.Events.APIGateway
+import Control.Lens
+
 import Lib
-import qualified Data.Aeson as Aeson
 
-import AWSLambda
+main = apiGatewayMain handler
 
-main = lambdaMain handler
-
-handler :: Aeson.Value -> IO [Int]
-handler evt = do
+handler :: APIGatewayProxyRequest (Embedded Value) -> IO (APIGatewayProxyResponse (Embedded [Int]))
+handler request = do
   putStrLn "This should go to logs"
   someFunc
-  print evt
-  pure [1, 2, 3]
+  print $ request ^. requestBody
+  pure $ responseOK & responseBodyEmbedded ?~ [1, 2, 3]

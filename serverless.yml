@@ -13,6 +13,11 @@ functions:
     # which points to the location where the Haskell package `mypackage` is
     # defined. This prefix is not needed when the Stack project is defined at
     # the same level as `serverless.yml`.
+    events:
+      - http:
+          path: summarize
+          method: get
 
 plugins:
   - serverless-haskell
+  - serverless-offline
