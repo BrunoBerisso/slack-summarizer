@@ -24,6 +24,9 @@ dependencies:
 - serverless-haskell
 - aeson
 - lens
+- http-conduit
+- http-client
+- http-client-tls
 
 library:
   source-dirs: src
