@@ -27,6 +27,7 @@ dependencies:
 - http-conduit
 - http-client
 - http-client-tls
+- bytestring
 
 library:
   source-dirs: src
