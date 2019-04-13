@@ -12,6 +12,8 @@ main = apiGatewayMain handler
 handler :: APIGatewayProxyRequest (Embedded Value) -> IO (APIGatewayProxyResponse (Embedded [Int]))
 handler request = do
   putStrLn "This should go to logs"
-  getMessages "C5UJEF537"
+  messages <- getMessages "C5UJEF537"
+  summary <- summarizeMessages messages
+  print summary
   print $ request ^. requestBody
   pure $ responseOK & responseBodyEmbedded ?~ [1, 2, 3]
