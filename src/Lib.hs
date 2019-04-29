@@ -4,14 +4,14 @@
 module Lib (getMessages, summarizeMessages) where
 
 import GHC.Generics
-import Data.ByteString.Char8 (pack)
+import Data.ByteString
 import Data.Aeson (FromJSON, Value, Object, (.:))
 import Data.Aeson.Types
 import Network.HTTP.Simple
 import Network.HTTP.Client
 import Network.HTTP.Client.TLS
 
-type ChannelId = String
+type ChannelId = ByteString
 
 data Message = Message {
     user :: String,
@@ -41,11 +41,11 @@ getSlackChannelHistory channel = setRequestHost "slack.com"
                                 $ setRequestPort 443
                                 $ setRequestQueryString [
                                     ("token", Just slackAccountToken),
-                                    ("channel", Just (pack channel)),
+                                    ("channel", Just channel),
                                     ("count", Just "5")]
                                 $ defaultRequest
 
-algorithmiaKey = pack "Simple simi/k2XRHwTjswcXf4NKuv7NVP1"
+algorithmiaKey = "Simple simi/k2XRHwTjswcXf4NKuv7NVP1"
 
 summarizeText text = setRequestHost "api.algorithmia.com"
                     $ setRequestPath "/v1/algo/nlp/Summarizer/0.1.8"
@@ -74,9 +74,6 @@ getMessages channelId = do
         parseResponseBody response = let body = getResponseBody response
                                     in parseEither (.: "messages") body 
 
-reduceToParagraph :: [Message] -> String
-reduceToParagraph = foldl (\paragraph message -> paragraph ++ (user message) ++ (text message)) ""
-
 summarizeMessages :: [Message] -> IO(String)
 summarizeMessages messages = do
     let paragraph = reduceToParagraph messages
@@ -88,4 +85,5 @@ summarizeMessages messages = do
     where
         parseResponseBody response = let body = getResponseBody response
                                     in parseEither (.: "result") body
+        reduceToParagraph = Prelude.foldl (\paragraph message -> paragraph ++ (user message) ++ (text message)) ""
 

@@ -28,6 +28,7 @@ dependencies:
 - http-client
 - http-client-tls
 - bytestring
+- containers
 
 library:
   source-dirs: src
