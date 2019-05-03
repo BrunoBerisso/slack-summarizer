@@ -1,7 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Main where
 
+import GHC.Generics
 import Data.Aeson
 import Data.Aeson.Embedded
 import AWSLambda.Events.APIGateway
@@ -19,6 +21,12 @@ data SummarizeParams = SummarizeParams {
   channelId :: ByteString -- C5UJEF537
 } deriving(Show)
 
+data SummarizeResponse = SummarizeResponse {
+  text :: String
+} deriving(Generic, Show)
+
+instance ToJSON SummarizeResponse
+
 parseQueryParams :: Query -> Maybe SummarizeParams
 parseQueryParams query =
   let
@@ -32,7 +40,7 @@ parseQueryParams query =
 
 main = apiGatewayMain handler
 
-handler :: APIGatewayProxyRequest (Embedded Value) -> IO (APIGatewayProxyResponse (Embedded [Int]))
+handler :: APIGatewayProxyRequest (Embedded Value) -> IO (APIGatewayProxyResponse (Embedded SummarizeResponse))
 handler request = do
   let query = request ^. agprqQueryStringParameters
   let body = request ^. requestBody
@@ -40,7 +48,6 @@ handler request = do
   params <- case parseQueryParams query of
     Just r -> return r
     Nothing -> fail "Can't read query string"
-  messages <- getMessages (channelId params)
-  summary <- summarizeMessages messages
+  summary <- getMessages (channelId params) >>= summarizeMessages
   print summary
-  pure $ responseOK & responseBodyEmbedded ?~ [1, 2, 3]
+  pure $ responseOK & responseBodyEmbedded ?~ (SummarizeResponse summary)

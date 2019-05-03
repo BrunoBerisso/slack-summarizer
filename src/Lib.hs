@@ -74,7 +74,7 @@ getMessages channelId = do
         parseResponseBody response = let body = getResponseBody response
                                     in parseEither (.: "messages") body 
 
-summarizeMessages :: [Message] -> IO(String)
+summarizeMessages :: [Message] -> IO (String)
 summarizeMessages messages = do
     let paragraph = reduceToParagraph messages
     response <- httpJSON $ summarizeText paragraph
