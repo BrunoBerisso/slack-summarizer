@@ -79,12 +79,14 @@ getMessages :: SummarizeParams -> IO ([Message])
 getMessages params = do
   slackAccountToken <- getEnv "SLACK_ACCOUNT_TOKEN"
   response <- httpJSON $ getSlackChannelHistory (Char8.pack slackAccountToken) (channelId params) (messageCount params)
-  messages <- case parseResponseBody response of
+  let responseBody = getResponseBody response
+  print responseBody
+  messages <- case parseResponseBody responseBody of
     Right m -> return m
     Left e  -> fail e
   return messages
   where
-      parseResponseBody response = parseEither (.: "messages") $ getResponseBody response
+      parseResponseBody = parseEither (.: "messages")
 
 summarizeMessages :: [Message] -> IO (String)
 summarizeMessages messages = do
@@ -96,5 +98,5 @@ summarizeMessages messages = do
   return text
   where
       parseResponseBody response = parseEither (.: "result") $ getResponseBody response
-      reduceToParagraph = Prelude.foldl (\paragraph message -> paragraph ++ (text message)) ""
+      reduceToParagraph = Prelude.foldl (\paragraph message -> (text message) ++ "\n" ++ paragraph) ""
 
