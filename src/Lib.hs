@@ -25,7 +25,6 @@ import System.Environment (getEnv)
 type ChannelId = ByteString
 
 data Message = Message {
-    user :: String,
     text :: String
 } deriving (Generic, Show)
 
@@ -97,5 +96,5 @@ summarizeMessages messages = do
   return text
   where
       parseResponseBody response = parseEither (.: "result") $ getResponseBody response
-      reduceToParagraph = Prelude.foldl (\paragraph message -> paragraph ++ (user message) ++ (text message)) ""
+      reduceToParagraph = Prelude.foldl (\paragraph message -> paragraph ++ (text message)) ""
 
