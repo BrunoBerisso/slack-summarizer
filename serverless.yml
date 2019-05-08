@@ -3,6 +3,8 @@ service: slack-summarizer
 provider:
   name: aws
   runtime: haskell
+  stage: dev
+  profile: bruno
 
 functions:
   slack-summarizer-func:
