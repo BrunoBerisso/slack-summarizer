@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Main where
@@ -22,8 +21,6 @@ main = apiGatewayMain handler
 
 handler :: APIGatewayProxyRequest (Embedded Value) -> IO (APIGatewayProxyResponse (Embedded SummarizeResponse))
 handler request = do
-  let query = request ^. agprqQueryStringParameters
-  let body = request ^. requestBody
   Prelude.putStrLn $ "Did receive query: " ++ (show query) ++ " With body: " ++ (show body)
   params <- case parseQueryParams query of
     Just r -> return r
@@ -31,3 +28,6 @@ handler request = do
   summary <- getMessages params >>= summarizeMessages
   print summary
   pure $ responseOK & responseBodyEmbedded ?~ (SummarizeResponse summary)
+  where
+    query = request ^. agprqQueryStringParameters
+    body = request ^. requestBody
