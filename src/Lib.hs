@@ -10,7 +10,6 @@ module Lib (
 
 import GHC.Generics
 import qualified Data.Map.Strict as Map
-import Data.Maybe (fromMaybe)
 import Data.ByteString
 import qualified Data.ByteString.Char8 as Char8
 import Data.ByteString.Conversion.From
@@ -38,13 +37,12 @@ data SummarizeParams = SummarizeParams {
 
 parseQueryParams :: Query -> Maybe SummarizeParams
 parseQueryParams query = do
-  responseUrl  <- flatten $ Map.lookup "response_url" params
-  channelId    <- flatten $ Map.lookup "channel_id" params
-  messageCount <- (flatten $ Map.lookup "text" params) >>= fromByteString
+  responseUrl  <- join $ Map.lookup "response_url" params
+  channelId    <- join $ Map.lookup "channel_id" params
+  messageCount <- (join $ Map.lookup "text" params) >>= fromByteString
   return $ SummarizeParams responseUrl channelId messageCount
   where
     params = Map.fromList query
-    flatten = join
 
 {-
 REQUESTS:
